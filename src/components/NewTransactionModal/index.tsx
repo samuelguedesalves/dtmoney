@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Modal from 'react-modal';
-import { Container, RadioBox, TransactionTypeContainer } from './styles';
+import { TransactionsContext } from '../../transactionsContext';
+
 import closeImg from '../../assets/close.svg';
 import incomeImg from '../../assets/income.svg';
 import outcomeImg from '../../assets/outcome.svg';
+
+import { Container, RadioBox, TransactionTypeContainer } from './styles';
 
 Modal.setAppElement('#root');
 
@@ -16,14 +19,29 @@ export const NewTransactionModal: React.FC<NewTransactionModalProps> = ({
   isOpen,
   onRequestClose
 }) => {
+  const { createTransaction } = useContext(TransactionsContext);
+
+  const [title, setTitle] = useState('');
+  const [value, setValue] = useState(0);
+  const [category, setCategory] = useState('');
   const [type, setType] = useState<'deposit' | 'withdraw'>('deposit');
 
-  function handleSetTypeDeposit() {
-    setType('deposit');
-  }
+  async function handleCreateNewTransaction(event: React.FormEvent) {
+    event.preventDefault();
 
-  function handleSetTypeWithdraw() {
-    setType('withdraw');
+    await createTransaction({
+      title,
+      value,
+      category,
+      type,
+    });
+
+    setTitle('');
+    setValue(0);
+    setCategory('');
+    setType('deposit');
+
+    onRequestClose();
   }
 
   return (
@@ -37,22 +55,28 @@ export const NewTransactionModal: React.FC<NewTransactionModalProps> = ({
         <img src={closeImg} alt="close" />
       </button>
 
-      <Container>
+      <Container
+        onSubmit={handleCreateNewTransaction}
+      >
         <h2>New transaction</h2>
 
         <input
           type="text"
           placeholder="Titulo"
+          value={title}
+          onChange={event => setTitle(event.target.value)}
         />
         <input
           type="number"
           placeholder="Valor"
+          value={value}
+          onChange={event => setValue(Number(event.target.value))}
         />
 
         <TransactionTypeContainer>
           <RadioBox
             type="button"
-            onClick={handleSetTypeDeposit}
+            onClick={() => setType('deposit')}
             isActive={type === 'deposit'}
             activeColor="green"
           >
@@ -63,7 +87,7 @@ export const NewTransactionModal: React.FC<NewTransactionModalProps> = ({
 
           <RadioBox
             type="button"
-            onClick={handleSetTypeWithdraw}
+            onClick={() => setType('withdraw')}
             isActive={type === 'withdraw'}
             activeColor="red"
           >
@@ -73,7 +97,10 @@ export const NewTransactionModal: React.FC<NewTransactionModalProps> = ({
         </TransactionTypeContainer>
 
         <input
+          type="text"
           placeholder="Categoria"
+          value={category}
+          onChange={event => setCategory(event.target.value)}
         />
 
         <button type="submit" >

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Dashboard } from './components/Dashboard';
-import { Header } from './components/Header';
-import { NewTransactionModal } from './components/NewTransactionModal';
 import { GlobalStyles } from './styles/global';
 
-
+import { NewTransactionModal } from './components/NewTransactionModal';
+import { Dashboard } from './components/Dashboard';
+import { Header } from './components/Header';
+import { TransactionsProvider } from './transactionsContext';
 
 const App: React.FC = () => {
   const [
@@ -21,7 +21,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <>
+    <TransactionsProvider>
       <Header
         onOpenNewTransactionalModal={handleOpenNewTransactionalModal}
       />
@@ -33,7 +33,7 @@ const App: React.FC = () => {
       />
 
       <GlobalStyles />
-    </>
+    </TransactionsProvider>
   );
 }
 
